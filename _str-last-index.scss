@@ -1,0 +1,21 @@
+////
+/// returns the last index of a string
+/// @group global
+/// @author Matthias Müller
+////
+
+
+@function str-last-index($string, $substring){
+	$i: 1;
+	$index: 0;
+	$newstring: $string;
+	@while( str-index($newstring, $substring) != null){
+	    $index: $index + str-index($newstring, $substring);
+      $newstring: str-slice($newstring, str-index($newstring, $substring)+1);
+	}
+	@if($index == 0){
+	  @return null;
+	}@else{
+	  @return $index;
+	}
+}
