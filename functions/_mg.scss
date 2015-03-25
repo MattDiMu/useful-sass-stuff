@@ -1,0 +1,18 @@
+/// checks property if a map has a key and returns it. This is similar to the standard 'map-get', but it throws a warning if the key doesn't exist (which is what you probably want in most cases)
+///
+/// @group global
+/// @author Matthias Müller
+///
+/// @param {map} $map Name of the map (when used in components|areas, the filename without '_')
+///
+/// @throws a warning in the console
+///
+/// @return {object}
+@function mg($map, $key){
+	@if(map-has-key($map, $key) ){
+		@return map-get($map, $key);
+	}@else{
+		@warn "No key '" + $key + "' defined in hash-map '" + $map + "'.";
+		@return "";
+	}
+}
