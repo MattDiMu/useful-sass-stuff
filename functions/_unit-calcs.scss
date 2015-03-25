@@ -1,0 +1,39 @@
+////
+/// some usefull unit-converting functions
+/// @group global
+/// @author Matthias Müller
+////
+
+
+/// convert px to rem
+///
+/// @param {px-unit} $px - pixel unit to be converted
+///
+/// @throws exception if units are wrong/missing
+///
+/// @return {rem-unit}
+
+@function rem($px){
+	@if(type-of($px) == "number" AND unit($px) == "px"){
+		@return $px / 16px * 1rem;
+	} @else {
+		@warn "rem() function requires 1 pixel unit parameter. e.g. '12px'";
+	}
+}
+
+
+/// convert px to em
+///
+/// @param {px-unit} $px - pixel unit to be converted
+///
+/// @throws exception if units are wrong/missing
+///
+/// @return {em-unit}
+
+@function em($px, $font-size: 16px){
+	@if(type-of($px) == "number" AND unit($px) == "px"){
+		@return $px / $font-size * 1em;
+	} @else {
+		@warn "em() function requires 1 pixel unit parameter. e.g. '12px'";
+	}
+}
