@@ -1,0 +1,75 @@
+/// Includes an svg-icon (generated from app/grunticon/**/*.svg ) or even an png as background-image or as background-image of a pseudo-element
+///
+/// @author Matthias Müller
+///
+/// @group icon
+///
+/// @param {path-to-image | data-image} $icon
+/// @param {length | percentage | auto} $size [32px] sets size-x and size-y
+/// @param {length | percentage | auto} $size-x [$size]
+/// @param {length | percentage | auto} $size-y [$size]
+/// @param {length | percentage} $position-x [0] background-position, e.g. 10px
+/// @param {length | percentage} $position-y [0] background-position, e.g. 50% to center it vertically
+/// @param {repeat | repeat-x | repeat-y | no-repeat} $repeat [no-repeat] 
+/// @param {angle | right | left | bottom} $rotate [none] uses a pseudo-element to position only the background
+/// @param {"before" | "after"} $pseudo [before] if rotate is used, you may switch between the before and after pseudo element
+///
+/// @todo currently behaves as background-image - make it possible to be placed outside too (e.g. placing-mode background vs right/bottom/top/left)
+///
+/// @throws wrong parameters exception
+///
+/// @output icon as background-image
+
+@mixin icon($icon, $size: 32px, $size-x: $size, $size-y: $size, $position-x: 0, $position-y: 0, $repeat: no-repeat, $rotate: none, $pseudo: "before") {
+	@if(type-of($icon) == "string"){ // and str-index($icon, "data:image") > 0
+		@if($rotate != none and ($pseudo == "before" or $pseudo == "after")){
+			@if($rotate == "right"){
+				$rotate: 90deg;
+			}@else if($rotate == "left"){
+				$rotate: 270deg;
+			}@else if($rotate == "bottom"){
+				$rotate: 180deg;
+			}
+			
+			$translateX: null;
+			@if(unit($position-x) == "%"){
+				$translateX: translateX(-1 * ($size-x * ($position-x / 100%)));
+			}
+			$translateY: null;
+			@if(unit($position-y) == "%"){
+				$translateY: translateY(-1 * ($size-y * ($position-y / 100%)));
+			}
+			
+			position: relative;
+			&::#{$pseudo} {
+				content: "";
+				position: absolute;
+				width: $size-x;
+				height: $size-y;
+				background-size: 100% 100%;
+				z-index: -1;
+				top: $position-y;
+				left: $position-x;
+				background-image: url($icon);
+				transform: $translateX $translateY rotate($rotate);
+				
+			}
+			
+		}@else{
+			
+			background-image: url($icon);
+			background-size: $size-x $size-y;
+			background-repeat: $repeat;
+			background-position: $position-x $position-y;
+
+		}
+
+		
+	}@else{
+		@warn "wrong parameters when calling mixin icon($icon--).";
+	}
+}
+
+
+
+
