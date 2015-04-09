@@ -1,0 +1,46 @@
+////
+/// automatically creates helper-classes for download, service and event
+/// misc-icons do NOT get any helper-classes
+/// @group helpers
+/// @author Matthias Müller
+////
+
+$var-suffix-hover: "-hover";
+
+
+@import "../scss-function/str-last-index";
+@import "../scss-mixin/icon";
+
+@each $iconname in map-keys($icon-map) {
+	$icondata: map-get($icon-map, $iconname);
+	
+	@if(str-index($iconname, "download-") == 1){
+		$last-index: str-last-index($iconname, "-");
+		$iconname-no-suffix: str-slice($iconname, 1, $last-index - 1);
+
+		@if(str-index($iconname, $var-suffix-hover)){
+			.#{$iconname-no-suffix}:hover, .#{$iconname-no-suffix}.hover{
+				@include icon($icondata, $size-x: 32px, $size-y: auto, $position-x: 10px, $position-y: 50%);
+			}
+		}@else{
+			.#{$iconname-no-suffix}{
+				@include icon($icondata, $size-x: 32px, $size-y: auto, $position-x: 10px, $position-y: 50%);
+			}
+
+		}
+
+	
+	}@else if(str-index($iconname, "service-")){
+		
+		.#{$iconname} {
+				@include icon($icondata, $size-x: 32px, $size-y: auto, $position-x: 10px, $position-y: 50%);
+		}
+		
+	}@else if (str-index($iconname, "event-")){
+		
+		.#{$iconname} {
+				@include icon($icondata, $size-x: 32px, $size-y: auto, $position-x: 10px, $position-y: 50%);
+		}		
+		
+	}
+}
