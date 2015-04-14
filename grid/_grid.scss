@@ -1,0 +1,127 @@
+////
+/// @group grid
+/// @author Matthias Müller
+////
+
+
+@import "grid-config";
+
+/// include some definitions only on some resolutions (media queries)
+/// @param {argList} 1 or more breakpoint-names, e.g. phone, phablet, tablet, laptop, desktop, small (phone or phablet) or large (tablet, laptop or desktop)
+/// @example
+/// 	@include mq(small){ ... }
+/// 	@include mq(phone, phablet, tablet) { ... }
+@mixin mq($breakpoint-name...){
+  
+  $q: unquote("");
+  @each $bp in $breakpoint-name {
+    $q: if(index($breakpoint-name, $bp) != 1, $q + ", ", $q);
+
+  	@if(map-has-key($breakpoints, $bp)){
+
+      @if map-has-key-deep($breakpoints, $bp, min){
+        $q: $q +  unquote("(min-width: #{em(map-get-deep($breakpoints, $bp, min))} )");
+      }
+      @if map-has-key-deep($breakpoints, $bp, max){
+        @if map-has-key-deep($breakpoints, $bp, min){
+          $q: $q + unquote(" and ");
+        }
+        $q: $q + unquote("(max-width: #{em(map-get-deep($breakpoints, $bp, max))} )");
+      }
+	
+  	}@else{
+  		@warn "mq() called with wrong arguments, needs to  be one of: " + inspect(map-keys($breakpoints)) + ". ";
+  	}
+    
+  }
+  @media #{$q}{
+    @content;
+  }
+
+}
+
+
+/// adjust the componenten to the grid
+/// @example
+/// 	grid(1 of 3) => on all devices, it takes 1 out of 3 available columns
+/// 	grid(1) => on all devices, it takes 1 out of 4 (default value) available columns
+/// 	grid(1 of 2, desktop 2 of 4) => takes on all devices except desktop 1 of 2 columns, on desktop 2 of 4
+/// 	grid(small 2 of 4, large 4 of 8) => takes on small devices (phone and phablet) 2 of 4 columns, on large (tablet, laptop, desktop) 4 of 8
+@mixin grid($lists...){
+
+  $columns-use: $_grid-columns-use;
+  $columns-max: $_grid-columns-max;
+  $fl: nth($lists, 1);
+  $fll: length($fl);
+  $skip-first: false;
+
+  //set a different default values if given
+  @if( $fll == 1 or $fll == 3 ){
+    $lists: list-remove($lists, 1);
+    $columns-use: nth($fl, 1);
+    @if( $fll == 3) {
+      $columns-max: nth($fl, 3);
+    }
+  }
+  
+  float: left;
+  clear: both;
+  @if $columns-use == $columns-max {
+    width: 100%;
+  }@else{
+  	$parts-use: $columns-use + ($columns-use - 1) * $_grid-gutter-ratio;
+  	$parts-max: $columns-max + ($columns-max - 1) * $_grid-gutter-ratio;
+    width: ($parts-use / $parts-max) * 100%;    
+    margin-right: (1 / $parts-max) * 100%;
+  }
+  
+  
+  // if non-default-values are given
+  @if length($lists) > 0{
+
+    @for $i from 1 through length($lists){
+      $list: nth($lists, $i);
+      $device: nth($list, 1);
+      $c-use: nth($list, 2);
+      $c-max: $columns-max;
+      @if length($list == 4){
+        $c-max: nth($list, 4);
+      }
+      
+      @include mq($device){
+        
+        @if $c-use == $c-max {
+          width: 100%;
+        }@else if($c-use < $c-max){
+          $p-use: $c-use + ($c-use - 1) * $_grid-gutter-ratio;
+          $p-max: $c-max + ($c-max - 1) * $_grid-gutter-ratio;
+          width: ($p-use / $p-max) * 100%;
+          margin-right: (1 / $p-max) * 100%;
+        }@else {
+          @warn "Wrong arguments on grid() mixin, an element cannot have more columns than available.";
+        }
+      }
+    }
+  }
+}
+
+/// defines, that this element is the last one in this row
+/// @example
+/// 	\* > li:nth-child(4n){ @include grid-last(); } => every 4th li-child has no margin on the right and floats right 
+@mixin grid-last(){
+  float: right;
+  margin-right: 0;
+}
+
+
+/// defines a container
+///
+/// @author Matthias Müller
+/// @require {placeholder} %clearfix
+///
+@mixin container($width: 100%){
+	@extend %clearfix;
+	width: $width;
+	margin-left: auto;
+	margin-right: auto;
+}
